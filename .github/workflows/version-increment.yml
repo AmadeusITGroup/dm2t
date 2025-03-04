@@ -1,0 +1,32 @@
+name: Version Increment and Tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Bump version
+        id: version
+        uses: codacy/git-version@2.8.0
+      - name: Use the version
+        run: |
+          echo ${{ steps.version.outputs.version }}
+      - name: Use the previous version
+        run: |
+          echo ${{ steps.version.outputs.previous-version }}
+      - name: Push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag v${{ steps.version.outputs.version }}
+          git push origin v${{ steps.version.outputs.version }}
